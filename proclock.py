@@ -63,7 +63,8 @@ def UnlockFolder():
                         except:
                             continue
                         else:
-                            newname = urlsafe_b64decode(bytes(os.path.splitext(files)[0].encode('utf-8'))) + bytes(os.path.splitext(files)[1].encode('utf-8'))
+                            newname = urlsafe_b64decode(bytes(os.path.splitext(files)[0].encode('utf-8'))) + b'.' + urlsafe_b64decode(bytes(os.path.splitext(files)[1][::-1][:-1][::-1].encode('utf-8')))
+                            #print(newname)
                             writepath = os.path.join(path,newname.decode('utf-8'))
                             print('Decrypting: '+filename)
                             repeat = divide%4
@@ -117,10 +118,10 @@ def LockFolder():
                         except:
                             continue
                         else:
-                            newname = urlsafe_b64encode(bytes(os.path.splitext(files)[0].encode('utf-8'))) + bytes(os.path.splitext(files)[1].encode('utf-8'))
+                            newname = urlsafe_b64encode(bytes(os.path.splitext(files)[0].encode('utf-8'))) + b'.' + urlsafe_b64encode(bytes(os.path.splitext(files)[1][::-1][:-1][::-1].encode('utf-8')))
                             writepath = os.path.join(path,newname.decode('utf-8'))
                             print('Encrypting: ' + filename)
-                            repeat = divide%4
+                            repeat = (divide%4)
                             encode(open(filename,'rb'),open(writepath,'wb'))
                             os.unlink(filename)
                             for i in range(repeat):
@@ -165,11 +166,12 @@ f.close()
 if not hashed==[]:
     CalculateTimes()
 def HandlePassword(password):
-    hashed = hashlib.sha512(password.encode('utf-8')).hexdigest()
+    hashed = hashlib.shake_256(password.encode('utf-8')).hexdigest(256)
     with open('procldta\dat.ini','w') as wr:
         wr.write(hashed)
     wr.close()
-
+#CalculateTimes()
+#UnlockFolder()
 def lockui():
     sys("cls")
     if exist(f'{direct}\\P__NPL'):
@@ -199,7 +201,7 @@ def lockui():
             password = input('What Password Do You Want: ')
         else:
             passwordchk = input("What is your password: ")
-            passwordchk = hashlib.sha512(passwordchk.encode('utf-8')).hexdigest()
+            passwordchk = hashlib.shake_256(passwordchk.encode('utf-8')).hexdigest(256)
             if passwordchk==''.join(test):
                 password = input('What Password Do You Want: ')
             else:
@@ -222,7 +224,7 @@ def lockui():
            exit()
         else:
             password = input("What is your password: ")
-            passwordchk = hashlib.sha512(password.encode('utf-8')).hexdigest()
+            passwordchk = hashlib.shake_256(password.encode('utf-8')).hexdigest(256)
             if passwordchk==''.join(test):
                 print('Make sure nothing is accessing the folder/files otherwise the DECRYPTION process will not work!!!!!!!!\nPress Any Key to start process!')
                 sys('pause > nul')
