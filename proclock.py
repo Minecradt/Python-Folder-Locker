@@ -1,4 +1,5 @@
 import os,hashlib
+import sys as sy
 from base64 import urlsafe_b64encode,encode,decode,urlsafe_b64decode
 sys = os.system
 sys('pip install pyAesCrypt > nul 2>nul')
@@ -44,6 +45,7 @@ def UnlockFolder():
         path = i
         try:
             os.listdir(path)
+            #print(path)
         except:
             pass
             #print('Error!')
@@ -159,7 +161,7 @@ def CalculateTimes():
     
     #print(divide)
 #print(lock)
-#exit()
+#sy.exit(0)
 with open('procldta/dat.ini','r') as f:
     hashed = f.readlines()
 f.close()
@@ -187,12 +189,12 @@ def lockui():
     except:
         print("Enter Number!")
         lockui()
-        exit()
+        sy.exit(0)
     else:
         if ans > 3 or ans < 1:
             print("Not Valid Option")
             lockui()
-            exit()
+            sy.exit(0)
     if ans==2:
         with open('procldta/dat.ini','r') as f:
             test = f.readlines()
@@ -206,7 +208,7 @@ def lockui():
                 password = input('What Password Do You Want: ')
             else:
                 lockui()
-                exit()
+                sy.exit(0)
         HandlePassword(password)
         if unlock==True:
             UnlockFolder()
@@ -221,7 +223,7 @@ def lockui():
            print('Please Set A Password')
            input()
            lockui()
-           exit()
+           sy.exit(0)
         else:
             password = input("What is your password: ")
             passwordchk = hashlib.shake_256(password.encode('utf-8')).hexdigest(256)
@@ -238,12 +240,12 @@ def lockui():
            print('Please Set A Password')
            input()
            lockui()
-           exit()
+           sy.exit(0)
         print('Make sure nothing is accessing the folder/files otherwise the ENCRYPTION process will not work!!!!!!!!\nPress Any Key to start process!')
         sys('pause > nul')
         LockFolder()
     else:
-        exit()
+        sy.exit(0)
     lockui()
-    exit()
+    sy.exit(0)
 lockui()
