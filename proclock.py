@@ -7,6 +7,7 @@ sys("color 2")
 import pyAesCrypt
 exist = os.path.isdir
 bufferSize = 64 * 1024
+global password
 try:
     os.mkdir("procldta")
 except:
@@ -31,7 +32,7 @@ direct = os.path.split(__file__)[0] + "\\procldta"
 
 
 #Folder Unlocking
-def UnlockFolder():
+def UnlockFolder(password1):
     from glob import glob
     from pathlib import Path
     import os
@@ -70,8 +71,12 @@ def UnlockFolder():
                             writepath = os.path.join(path,newname.decode('utf-8'))
                             print('Decrypting: '+filename)
                             repeat = divide%4
-                            decode(open(filename,'rb'),open(writepath,'wb'))
+                            pyAesCrypt.decryptFile(filename,writepath + '.1',password1,bufferSize)
                             os.unlink(filename)
+                            os.rename(writepath + '.1',os.path.splitext(writepath + '.1')[0])
+                            decode(open(writepath,'rb'),open(writepath + '.1','wb'))
+                            os.unlink(writepath)
+                            os.rename(writepath + '.1',os.path.splitext(writepath + '.1')[0])
                             for i in range(repeat):
                                 decode(open(writepath,'rb'),open(writepath+'.1','wb'))
                                 os.unlink(writepath)
@@ -87,7 +92,7 @@ def UnlockFolder():
 
 
 #Folder Locking
-def LockFolder():
+def LockFolder(password1):
     from glob import glob
     from pathlib import Path
     import os
@@ -130,6 +135,9 @@ def LockFolder():
                                 encode(open(writepath,'rb'),open(writepath + '.1','wb'))
                                 os.unlink(writepath)
                                 os.rename(writepath + '.1',os.path.splitext(writepath + '.1')[0])
+                            pyAesCrypt.encryptFile(writepath,writepath + '.1',password1,bufferSize)
+                            os.unlink(writepath)
+                            os.rename(writepath + '.1',os.path.splitext(writepath + '.1')[0])
     os.rename(direct + '\\tmp\\P__NPL',direct + '\\P__NPL')
     os.rmdir(direct + '\\tmp')
 
@@ -230,7 +238,7 @@ def lockui():
             if passwordchk==''.join(test):
                 print('Make sure nothing is accessing the folder/files otherwise the DECRYPTION process will not work!!!!!!!!\nPress Any Key to start process!')
                 sys('pause > nul')
-                UnlockFolder()
+                UnlockFolder(password)
                 del password
     elif ans==1:
         with open('procldta/dat.ini','r') as f:
@@ -241,9 +249,12 @@ def lockui():
            input()
            lockui()
            sy.exit(0)
-        print('Make sure nothing is accessing the folder/files otherwise the ENCRYPTION process will not work!!!!!!!!\nPress Any Key to start process!')
-        sys('pause > nul')
-        LockFolder()
+        password = input("What is your password: ")
+        passwordchk = hashlib.shake_256(password.encode('utf-8')).hexdigest(256)
+        if passwordchk==''.join(test):
+            print('Make sure nothing is accessing the folder/files otherwise the ENCRYPTION process will not work!!!!!!!!\nPress Any Key to start process!')
+            sys('pause > nul')
+            LockFolder(password)
     else:
         sy.exit(0)
     lockui()
